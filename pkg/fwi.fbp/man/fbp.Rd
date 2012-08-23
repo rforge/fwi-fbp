@@ -7,10 +7,10 @@ Fire Behavior Prediction System function
 fbp calculates the outputs from the Fire Behavior Prediction (FBP) System (Forestry Canada Fire Danger Group 1992) based on given fire weather conditions (from the Fire Weather Index (FWI) System (Van Wagner 1987)), fuel type, and slope (optional).  Fire weather, for the purpose of FBP System calculation, comprises daily weather observations of wind speed and wind direction, and associated outputs from the Fire Weather Index System including fine fuel moisture content (FFMC) and buildup index (BUI).  FWI System components can be calculated with the sister functions fwi and fwiBAT. 
 }
 \usage{
-fbp(dat = NULL, output = "Primary")
+fbp(input = NULL, output = "Primary")
 }
 \arguments{
-  \item{dat}{
+  \item{input}{
     The input data, a dataframe containing fuel types, fire weather component, and slope (see below).  These inputs consist of daily record(s) for a single point (e.g. one weather station) or multiple points (multiple weather stations or a gridded surface).  All input variables have to be named exactly as listed below; however, the variables do not have to be in any particular order. Fuel type is of type character; other arguments are numeric.  Missing values in numeric variables could either be assigned as NA or -1.
     
     \tabular{lll}{

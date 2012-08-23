@@ -7,11 +7,11 @@ Fire Weather Index function
 \code{\link{fwi}} is used to calculate the outputs of the Fire Weather Index (FWI) System for one day based on noon local standard time (LST) weather observations of temperature, relative humidity, wind speed, and 24-hour rainfall, as well as the previous day's weather conditions.  This function could be used for either one weather station or for multiple weather stations or a gridded surface.  This is a lower-level function that allows for maximum flexibility in FWI System component calculations.  This package also contains a similar high-level function, \code{\link{fwiBAT}} (for FWI System batch calculation). 
 }
 \usage{
-fwi(dat, yda.fwi = NULL, init = c(ffmc_yda = 85, dmc_yda = 6, dc_yda = 15, lat = 55),out="all",lat.adjust=TRUE)
+fwi(input, yda.fwi = NULL, init = c(ffmc_yda = 85, dmc_yda = 6, dc_yda = 15, lat = 55),out="all",lat.adjust=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{dat}{
+  \item{input}{
     A dataframe containing input variables of daily weather observations taken at noon LST.  Variable names have to be the same as in the following list, but are case insensitive.  The order in which the input variables are entered is not important. 
 
     \tabular{ll}{

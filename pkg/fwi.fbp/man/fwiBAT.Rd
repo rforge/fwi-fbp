@@ -7,11 +7,11 @@ Fire Weather Index batch function
 fwiBAT generates the Fire Weather Index (FWI) System for one weather station during a continuous period of time.  This is a high-level function in which FWI System components are calculated from a list of consecutive (e.g., all days of a fire season).  For maximum flexibility, the low-level function fwi should be used. 
 }
 \usage{
-fwiBAT(dat, init=c(ffmc_yda=85,dmc_yda=6,dc_yda=15,lat=55),out="all",lat.adjust=TRUE)
+fwiBAT(input, init=c(ffmc_yda=85,dmc_yda=6,dc_yda=15,lat=55),out="all",lat.adjust=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-  \item{dat}{
+  \item{input}{
     A dataframe containing input variables of daily weather observations taken at noon LST.  Variable names have to be the same as in the following list, but are case insensitive.  The order in which the input variables are entered is not important. 
     
     \tabular{ll}{
