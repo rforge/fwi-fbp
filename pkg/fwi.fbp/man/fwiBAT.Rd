@@ -90,5 +90,5 @@ fwi.out<-fwiBAT(test_fwi,init=c(80,10,16,50))
 
 # using only the required input variables:
 fwi.out<-fwiBAT(test_fwi[,7:10])
-
+}
 \keyword{ methods }
