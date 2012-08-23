@@ -98,56 +98,56 @@ fbp  <- function(input=NULL,output="Primary"){                                  
   names(CFLs)<-c("C1","C2","C3","C4","C5","C6","C7","D1","M1","M2","M3","M4","S1","S2","S3","O1a","O1b")
   CFL    <- ifelse(CFL <= 0|CFL>2.0,CFLs[FUELTYPE],CFL)
   
-  FMC    <- ifelse(FMC <= 0 | FMC > 120,FMCcalc(LAT, LONG, ELV, DJ, D0),FMC)
-  SFC    <- SFCcalc(FUELTYPE, FFMC, BUI, PC, GFL)
+  FMC    <- ifelse(FMC <= 0 | FMC > 120,.FMCcalc(LAT, LONG, ELV, DJ, D0),FMC)
+  SFC    <- .SFCcalc(FUELTYPE, FFMC, BUI, PC, GFL)
   BUI    <- ifelse(BUIEFF !=1,0,BUI)
-  WSV0   <- Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS,SAZ, FMC, SFC, PC, PDF, CC, CBH,ISI,output="WSV")                                     #/* This turns off BUI effect */
+  WSV0   <- .Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS,SAZ, FMC, SFC, PC, PDF, CC, CBH,ISI,output="WSV")                                     #/* This turns off BUI effect */
   WSV    <- ifelse(GS > 0 & FFMC > 0,WSV0,WS)
-  RAZ0   <- Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS,SAZ, FMC, SFC, PC, PDF, CC, CBH,ISI,output="RAZ")
+  RAZ0   <- .Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS,SAZ, FMC, SFC, PC, PDF, CC, CBH,ISI,output="RAZ")
   RAZ    <- ifelse(GS > 0 & FFMC > 0,RAZ0,WAZ)
-  ISI    <- ifelse(FFMC > 0,ISIcalc(FFMC, WSV),ISI)
-  ROS    <- ifelse(FUELTYPE %in% c("C6"),C6calc(FUELTYPE,ISI,BUI,FMC,SFC,CBH,option="ROS"),ROScalc(FUELTYPE,ISI,BUI,FMC,SFC,PC,PDF,CC,CBH))
-  CFB    <- ifelse(FUELTYPE %in% c("C6"),C6calc(FUELTYPE,ISI,BUI,FMC,SFC,CBH,option="CFB"),ifelse(CFL>0,CFBcalc(FUELTYPE,FMC,SFC,ROS,CBH),0))
+  ISI    <- ifelse(FFMC > 0,.ISIcalc(FFMC, WSV),ISI)
+  ROS    <- ifelse(FUELTYPE %in% c("C6"),.C6calc(FUELTYPE,ISI,BUI,FMC,SFC,CBH,option="ROS"),.ROScalc(FUELTYPE,ISI,BUI,FMC,SFC,PC,PDF,CC,CBH))
+  CFB    <- ifelse(FUELTYPE %in% c("C6"),.C6calc(FUELTYPE,ISI,BUI,FMC,SFC,CBH,option="CFB"),ifelse(CFL>0,.CFBcalc(FUELTYPE,FMC,SFC,ROS,CBH),0))
   
     #don't think we need this line - done in the line above
-  #CFB    <- ifelse(CFL==0,0,CFBcalc(FUELTYPE, FMC, SFC, ROS, CBH))
+  #CFB    <- ifelse(CFL==0,0,.CFBcalc(FUELTYPE, FMC, SFC, ROS, CBH))
   
-  TFC    <- TFCcalc(FUELTYPE, CFL, CFB, SFC, PC, PDF)
-  HFI    <- FIcalc(TFC,ROS)
+  TFC    <- .TFCcalc(FUELTYPE, CFL, CFB, SFC, PC, PDF)
+  HFI    <- .FIcalc(TFC,ROS)
   CFB    <- ifelse(HR < 0,-CFB,CFB)
   RAZ    <- RAZ * 180/pi
   RAZ    <- ifelse(RAZ==360,0,RAZ)                                                                                                       # 360 degree is the same as 0, FBP use 0 instead (Wotton etal 2009)
   FD     <- rep("I",length(CFB))
   FD     <- ifelse(CFB<0.10,"S",FD)
   FD     <- ifelse(CFB>0.90,"C",FD)
-  CFC    <- TFCcalc(FUELTYPE, CFL, CFB, SFC, PC, PDF,option="CFC")
+  CFC    <- .TFCcalc(FUELTYPE, CFL, CFB, SFC, PC, PDF,option="CFC")
   if (output=="Secondary"|output=="All"){
       SF     <- ifelse (GS >= 70,10,exp(3.533 * (GS/100)^1.2))                                                                         # /* 39 */
-      CSI    <- CFBcalc(FUELTYPE,FMC,SFC,ROS,CBH,option="CSI")
-      RSO    <- CFBcalc(FUELTYPE,FMC,SFC,ROS,CBH,option="RSO")
-      BE     <- BEcalc(FUELTYPE,BUI)
-      LB     <- LBcalc(FUELTYPE, WSV)
-      LBt    <- ifelse(ACCEL == 0,LB,LBtcalc(FUELTYPE,LB,HR,CFB))
-      BROS   <- BROScalc(FUELTYPE,FFMC,BUI,WSV,FMC,SFC,PC,PDF,CC,CBH)
-      FROS   <- FROScalc(ROS, BROS, LB)
+      CSI    <- .CFBcalc(FUELTYPE,FMC,SFC,ROS,CBH,option="CSI")
+      RSO    <- .CFBcalc(FUELTYPE,FMC,SFC,ROS,CBH,option="RSO")
+      BE     <- .BEcalc(FUELTYPE,BUI)
+      LB     <- .LBcalc(FUELTYPE, WSV)
+      LBt    <- ifelse(ACCEL == 0,LB,.LBtcalc(FUELTYPE,LB,HR,CFB))
+      BROS   <- .BROScalc(FUELTYPE,FFMC,BUI,WSV,FMC,SFC,PC,PDF,CC,CBH)
+      FROS   <- .FROScalc(ROS, BROS, LB)
      #/* TROS is the rate of spread towards angle THETA */
       E      <- sqrt(1-1/LB/LB)                                                                                                          #/* eccentricity */
       TROS   <- ROS * (1-E)/(1-E*cos(THETA - RAZ))                                                                                       #/* note: this is the old method using the focus as the ignition point */
     #//   TROS <- ROSthetacalc(ROS, FROS, BROS, THETA)                                                                                   #MARC: what is this?
-      ROSt   <- ifelse(ACCEL==0,ROS,ROStcalc(FUELTYPE, ROS, HR, CFB))
-      FROSt  <- ifelse(ACCEL==0,FROS,FROScalc(ROSt, BROSt, LBt))
-      BROSt  <- ifelse(ACCEL==0,BROS,ROStcalc(FUELTYPE, BROS, HR, CFB))
+      ROSt   <- ifelse(ACCEL==0,ROS,.ROStcalc(FUELTYPE, ROS, HR, CFB))
+      FROSt  <- ifelse(ACCEL==0,FROS,.FROScalc(ROSt, BROSt, LBt))
+      BROSt  <- ifelse(ACCEL==0,BROS,.ROStcalc(FUELTYPE, BROS, HR, CFB))
       TROSt  <- ifelse(ACCEL==0,TROS,ROSt * (1.-sqrt(1.-1./LBt/LBt))/(1.-sqrt(1.-1./LBt/LBt)*cos(THETA - RAZ)))                          #/* note: this is the old method using the focus as the ignition point */
-      FCFB   <- ifelse(CFL==0,0,ifelse(FUELTYPE %in% c("C6"),0,CFBcalc(FUELTYPE, FMC, SFC, FROS, CBH)))
-      BCFB   <- ifelse(CFL==0,0,ifelse(FUELTYPE %in% c("C6"),0,CFBcalc(FUELTYPE, FMC, SFC, BROS, CBH)))
-      TCFB   <- ifelse(CFL==0,0,ifelse(FUELTYPE %in% c("C6"),0,CFBcalc(FUELTYPE, FMC, SFC, TROS, CBH)))
-      FTFC   <- TFCcalc(FUELTYPE, CFL, FCFB, SFC, PC, PDF)
-      BTFC   <- TFCcalc(FUELTYPE, CFL, BCFB, SFC, PC, PDF)
-      TTFC   <- TFCcalc(FUELTYPE, CFL, TCFB, SFC, PC, PDF)
+      FCFB   <- ifelse(CFL==0,0,ifelse(FUELTYPE %in% c("C6"),0,.CFBcalc(FUELTYPE, FMC, SFC, FROS, CBH)))
+      BCFB   <- ifelse(CFL==0,0,ifelse(FUELTYPE %in% c("C6"),0,.CFBcalc(FUELTYPE, FMC, SFC, BROS, CBH)))
+      TCFB   <- ifelse(CFL==0,0,ifelse(FUELTYPE %in% c("C6"),0,.CFBcalc(FUELTYPE, FMC, SFC, TROS, CBH)))
+      FTFC   <- .TFCcalc(FUELTYPE, CFL, FCFB, SFC, PC, PDF)
+      BTFC   <- .TFCcalc(FUELTYPE, CFL, BCFB, SFC, PC, PDF)
+      TTFC   <- .TFCcalc(FUELTYPE, CFL, TCFB, SFC, PC, PDF)
     #/* equilibrium values */
-      FFI    <- FIcalc(FTFC, FROS)
-      BFI    <- FIcalc(BTFC, BROS)
-      TFI    <- FIcalc(TTFC, TROS)
+      FFI    <- .FIcalc(FTFC, FROS)
+      BFI    <- .FIcalc(BTFC, BROS)
+      TFI    <- .FIcalc(TTFC, TROS)
   
     #/* For now... */
       TI     <- 0
