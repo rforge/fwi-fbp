@@ -85,12 +85,12 @@
                 log(0.01)/(-b[["D1"]]),
                 ISF_D1)                                                                                                                # /* 41b - 2009 */
      ISF    <- ifelse(FUELTYPE %in% c("M4"),PDF/100*ISF_M4 + (1-PDF/100.)*ISF_D1,ISF)                                                  # /* 42c - 2009 */
-   # FUELTYPE c("O1a","O1b")
-     CF     <- ifelse(FUELTYPE %in% c("O1a","O1b"),ifelse(CC < 58.8,0.005*(exp(0.061*CC)-1),                                           # /* 35a - 2009 */
+   # FUELTYPE c("O1A","O1B")
+     CF     <- ifelse(FUELTYPE %in% c("O1A","O1B"),ifelse(CC < 58.8,0.005*(exp(0.061*CC)-1),                                           # /* 35a - 2009 */
             0.176 + 0.02*(CC-58.8)),                                                                                                   # /* 35b - 2009 */
             CF)
 
-     ISF    <- ifelse(FUELTYPE %in% c("O1a","O1b"),ifelse((1 - (RSF/(CF*a[FUELTYPE]))**(1/c0[FUELTYPE])) >= 0.01,
+     ISF    <- ifelse(FUELTYPE %in% c("O1A","O1B"),ifelse((1 - (RSF/(CF*a[FUELTYPE]))**(1/c0[FUELTYPE])) >= 0.01,
              log(1 - (RSF/(CF*a[FUELTYPE]))**(1/c0[FUELTYPE]))/(-b[FUELTYPE]),                                                         # /* 43a - 2009 */
              log(0.01)/(-b[FUELTYPE])),                                                                                                # /* 43b - 2009 */
              ISF)
