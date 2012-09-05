@@ -6,13 +6,13 @@ fbp  <- function(input=NULL,output="Primary"){                                  
   if(is.null(input)){                                                                                                                     # default input data is NULL
     FUELTYPE     <- "C2"; ACCEL <- 0; DJ <- 180;D0 <- 0; ELV <- 100; BUIEFF <- 1; HR <- 0; FFMC <- 90
     ISI          <- 0;BUI <- 60; WS <- 10; WD <- 0; GS  <- 0; ASPECT <- 0;PC <- 50; PDF <- 35; CC <- 80
-    GFL          <- 3; CBH <- 7; CFL <- -1; LAT <- 55; LONG <- -120; FMC <- 0; THETA <- 0
-    input          <- as.data.frame(cbind(ACCEL,DJ,D0,ELV,BUIEFF,HR,FFMC,ISI,BUI,WS,WD,GS,ASPECT,PC,PDF,CC,GFL,CBH,CFL,LAT,LONG,FMC,THETA))
-    input          <- cbind(FUELTYPE,input)
-    input[,1]      <- as.character(input[,1])
-    } else {
+    GFL          <- 0.35; CBH <- 3; CFL <- -1; LAT <- 55; LONG <- -120; FMC <- 0; THETA <- 0
+    input        <- as.data.frame(cbind(ACCEL,DJ,D0,ELV,BUIEFF,HR,FFMC,ISI,BUI,WS,WD,GS,ASPECT,PC,PDF,CC,GFL,CBH,CFL,LAT,LONG,FMC,THETA))
+    input        <- cbind(FUELTYPE,input)
+    input[,1]    <- as.character(input[,1])
+    } else {                                             
     names(input)<-toupper(names(input))
-    ID<-input$ID;FUELTYPE<-input$FUELTYPE;FFMC<-input$FFMC;BUI<-input$BUI;WS<-input$WS;WD<-input$WD;FMC<-input$FMC
+    ID<-input$ID;FUELTYPE<-toupper(input$FUELTYPE);FFMC<-input$FFMC;BUI<-input$BUI;WS<-input$WS;WD<-input$WD;FMC<-input$FMC
     GS<-input$GS;LAT<-input$LAT;LONG<-input$LONG;ELV<-input$ELV;DJ<-input$DJ;D0<-input$D0;SD<-input$SD;SH<-input$SH
     HR<-input$HR;PC<-input$PC;PDF<-input$PDF;GFL<-input$GFL;CC<-input$CC;THETA<-input$THETA;ACCEL<-input$ACCEL
     ASPECT<-input$ASPECT;BUIEFF<-input$BUIEFF;CBH<-input$CBH;CFL<-input$CFL;ISI<-input$ISI
@@ -20,47 +20,59 @@ fbp  <- function(input=NULL,output="Primary"){                                  
     n0 <- nrow(input)
     if(!exists("FUELTYPE")|is.null(FUELTYPE)) FUELTYPE<-rep("C2",n0);if(!exists("FFMC")|is.null(FFMC)) FFMC<-rep(90,n0);if(!exists("BUI")|is.null(BUI)) BUI<-rep(60,n0)
     if(!exists("WS")|is.null(WS)) WS<-rep(10,n0);if(!exists("WD")|is.null(WD)) WD<-rep(0,n0);if(!exists("FMC")|is.null(FMC)) FMC<-rep(0,n0);if(!exists("GS")|is.null(GS)) GS<-rep(0,n0)
-    if(!exists("LAT")|is.null(LAT)) LAT<-rep(55,n0);if(!exists("LONG")|is.null(LONG)) LONG<-rep(-120,n0);if(!exists("ELV")|is.null(ELV)) ELV<-rep(100,n0)
+    if(!exists("LAT")|is.null(LAT)) LAT<-rep(55,n0);if(!exists("LONG")|is.null(LONG)) LONG<-rep(-120,n0);if(!exists("ELV")|is.null(ELV)) ELV<-rep(-1,n0)
     if(!exists("SD")|is.null(SD)) SD<-rep(0,n0);if(!exists("SH")|is.null(SH)) SH<-rep(0,n0);if(!exists("DJ")|is.null(DJ)) DJ<-rep(180,n0);if(!exists("D0")|is.null(D0)) D0<-rep(0,n0)
-    if(!exists("HR")|is.null(HR)) HR<-rep(0,n0);if(!exists("PC")|is.null(PC)) PC<-rep(50,n0);if(!exists("PDF")|is.null(PDF)) PDF<-rep(35,n0);if(!exists("GFL")|is.null(GFL)) GFL<-rep(3,n0)
+    if(!exists("HR")|is.null(HR)) HR<-rep(0,n0);if(!exists("PC")|is.null(PC)) PC<-rep(50,n0);if(!exists("PDF")|is.null(PDF)) PDF<-rep(35,n0);if(!exists("GFL")|is.null(GFL)) GFL<-rep(0.35,n0)
     if(!exists("CC")|is.null(CC)) CC<-rep(80,n0);if(!exists("THETA")|is.null(THETA)) THETA<-rep(0,n0);if(!exists("ACCEL")|is.null(ACCEL)) ACCEL<-rep(0,n0)
-    if(!exists("ASPECT")|is.null(ASPECT)) ASPECT<-rep(0,n0);if(!exists("BUIEFF")|is.null(BUIEFF)) BUIEFF<-rep(1,n0);if(!exists("CBH")|is.null(CBH)) CBH<-rep(7,n0)
+    if(!exists("ASPECT")|is.null(ASPECT)) ASPECT<-rep(0,n0);if(!exists("BUIEFF")|is.null(BUIEFF)) BUIEFF<-rep(1,n0);if(!exists("CBH")|is.null(CBH)) CBH<-rep(3,n0)
     if(!exists("CFL")|is.null(CFL)) CFL<-rep(-1,n0);if(!exists("ISI")|is.null(ISI)) ISI<-rep(0,n0)
     
     ### Data cleaning up
     WD     <- WD * pi/180
     THETA  <- THETA * pi/180
+    ASPECT <- ifelse(is.na(ASPECT),0,ASPECT)
     ASPECT <- ifelse(ASPECT < 0,ASPECT+360,ASPECT)
     ASPECT <- ASPECT * pi/180
 
     ACCEL  <- ifelse(is.na(ACCEL)|ACCEL < 0,0,1)	                                                                                                   # line (no accelleration effect) */
-    DJ     <- ifelse(is.na(DJ)|DJ < 0 | DJ > 366,0,DJ)
+    DJ     <- ifelse(DJ < 0 | DJ > 366,0,DJ)
+    DJ     <- ifelse(is.na(DJ),180,DJ)
     D0     <- ifelse(is.na(D0)|D0 < 0 | D0 > 366,0,D0)
-    ELV    <- ifelse(is.na(ELV)|ELV < 0 | ELV > 10000,0,ELV)
+    ELV    <- ifelse(ELV < 0 | ELV > 10000,0,ELV)
+    ELV    <- ifelse(is.na(ELV),100,ELV)
     BUIEFF <- ifelse(BUIEFF < 0,0,1)
     BUIEFF <- ifelse(is.na(BUIEFF),1,BUIEFF)
     HR     <- ifelse(HR < 0,-HR,HR)                                                                                                    # Originally "T"
     HR     <- ifelse(HR > 366*24,24,HR)
     HR     <- ifelse(is.na(HR),0,HR)
-    FFMC   <- ifelse(is.na(FFMC)|FFMC < 0 | FFMC > 101.,0,FFMC)
+    FFMC   <- ifelse(FFMC < 0 | FFMC > 101.,0,FFMC)
+    FFMC   <- ifelse(is.na(FFMC),90,FFMC)
     ISI    <- ifelse(is.na(ISI)|ISI < 0 | ISI > 300,0,ISI)
-    BUI    <- ifelse(is.na(BUI)|BUI < 0 | BUI > 1000,0,BUI)
-    WS     <- ifelse(is.na(WS)|WS < 0 | WS > 300,0,WS)
+    BUI    <- ifelse(BUI < 0 | BUI > 1000,0,BUI)
+    BUI    <- ifelse(is.na(BUI),60,BUI)
+    WS     <- ifelse(WS < 0 | WS > 300,0,WS)
+    WS     <- ifelse(is.na(WS),10,WS)
     WD     <- ifelse(is.na(WD)|WD < -2*pi | WD > 2*pi,0,WD)
     GS     <- ifelse(is.na(GS)|GS < 0 | GS > 200,0,GS)
     GS     <- ifelse(ASPECT < -2*pi | ASPECT > 2*pi,0,GS)
     PC     <- ifelse(is.na(PC)|PC < 0 | PC > 100,50,PC)
     PDF    <- ifelse(is.na(PDF)|PDF < 0 | PDF > 100,35.0,PDF)
-    CC     <- ifelse(is.na(CC)|CC <= 0 | CC > 100,95,CC)                                                                                         # originally "c"
+    CC     <- ifelse(CC <= 0 | CC > 100,95,CC)                                                                                         # originally "c"
+    CC     <- ifelse(is.na(CC),80,CC)                                                                                         # originally "c"
     GFL    <- ifelse(is.na(GFL)|GFL <= 0 | GFL > 100,0.35,GFL)                                                                                    # changed from 0.3 to 0.35, pg 6 - 2009 */
-    LAT    <- ifelse(is.na(LAT)|LAT < -90 | LAT > 90,55,LAT)
-    LONG    <- ifelse(is.na(LONG)|LONG < -180 | LONG > 360,0,LONG)
+    LAT    <- ifelse(LAT < -90 | LAT > 90,0,LAT)
+    LAT    <- ifelse(is.na(LAT),55,LAT)
+    LONG    <- ifelse(LONG < -180 | LONG > 360,0,LONG)
+    LONG    <- ifelse(is.na(LONG),-120,LONG)
     THETA  <- ifelse(is.na(THETA)|THETA  < -2*pi | THETA > 2*pi,0,THETA)
-    SD     <- ifelse(is.na(SD)|SD < 0 | SD > 100000, -999,SD)
-    SH     <- ifelse(is.na(SH)|SH < 0 | SH > 100, -999,SH)
+    SD     <- ifelse(SD < 0 | SD > 100000, -999,SD)
+    SD     <- ifelse(is.na(SD), 0,SD)
+    SH     <- ifelse(SH < 0 | SH > 100, -999,SH)
+    SH     <- ifelse(is.na(SH),0,SH)
   }
 
-  FUELTYPE<-as.character(FUELTYPE)
+  FUELTYPE <- sub("-","",FUELTYPE)
+
   # Convert time from hours to minutes */
   HR     <- HR*60.
   # Corrections to reorient WAZ, SAZ */
@@ -78,7 +90,7 @@ fbp  <- function(input=NULL,output="Primary"){                                  
   ## Initialize the output variables.
   SFC    <- TFC<-HFI<-CFB<-ROS<-rep(0,length(LONG))                                                                                       # value 0 means non-fuel or ffmc == 0.
   RAZ    <- rep(-999,length(LONG))                                                                                                        # value -999 means non-fuel or ffmc == 0. Nobody cares about the wind direction in such area.
-  if (output=="Secondary"|output=="All"){
+  if (output=="Secondary"|output=="All"|output =="S"|output =="A"){
     FROS <- BROS<-TROS<-HROSt<-FROSt<-BROSt<-TROSt<-FCFB<-
     BCFB <- TCFB<-FFI<-BFI<-TFI<-FTFC<-BTFC<-TTFC<-rep(0,length(LONG))
     TI   <- FTI<-BTI<-TTI<-LB<-WSV<- rep(-999,length(LONG))
@@ -86,19 +98,19 @@ fbp  <- function(input=NULL,output="Primary"){                                  
   
   #/* presently, we do not accept a zero CBH; use near zero if necessary */
   CBHs   <- c(2,3,8,4,18,7,10,0,6,6,6,6,0,0,0,0,0)
-  names(CBHs)<-c("C1","C2","C3","C4","C5","C6","C7","D1","M1","M2","M3","M4","S1","S2","S3","O1a","O1b")
+  names(CBHs)<-c("C1","C2","C3","C4","C5","C6","C7","D1","M1","M2","M3","M4","S1","S2","S3","O1A","O1B")
   
-  CBH    <- ifelse(CBH <= 0 | CBH > 50, ifelse(FUELTYPE %in% c("C6")&SD>0&SH>0,
+  CBH    <- ifelse(CBH <= 0 | CBH > 50 | is.na(CBH), ifelse(FUELTYPE %in% c("C6")&SD>0&SH>0,
           -11.2 + 1.06*SH + 0.00170*SD,                                                                                                  #/* 91 */
           CBHs[FUELTYPE]),CBH)
   CBH    <- ifelse(CBH <0,0.0000001,CBH)
   
   #/* presently, we do not accept a zero CFL,; use near zero if necessary */
   CFLs   <- c(0.75,0.80,1.15,1.20,1.20,1.80,0.5,0,0.80,0.80,0.80,0.80,0,0,0,0,0)
-  names(CFLs)<-c("C1","C2","C3","C4","C5","C6","C7","D1","M1","M2","M3","M4","S1","S2","S3","O1a","O1b")
-  CFL    <- ifelse(CFL <= 0|CFL>2.0,CFLs[FUELTYPE],CFL)
+  names(CFLs)<-c("C1","C2","C3","C4","C5","C6","C7","D1","M1","M2","M3","M4","S1","S2","S3","O1A","O1B")
+  CFL    <- ifelse(CFL <= 0|CFL>2.0|is.na(CFL),CFLs[FUELTYPE],CFL)
   
-  FMC    <- ifelse(FMC <= 0 | FMC > 120,.FMCcalc(LAT, LONG, ELV, DJ, D0),FMC)
+  FMC    <- ifelse(FMC <= 0 | FMC > 120 | is.na(FMC),FMCcalc(LAT, LONG, ELV, DJ, D0),FMC)
   SFC    <- .SFCcalc(FUELTYPE, FFMC, BUI, PC, GFL)
   BUI    <- ifelse(BUIEFF !=1,0,BUI)
   WSV0   <- .Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS,SAZ, FMC, SFC, PC, PDF, CC, CBH,ISI,output="WSV")                                     #/* This turns off BUI effect */
@@ -121,7 +133,7 @@ fbp  <- function(input=NULL,output="Primary"){                                  
   FD     <- ifelse(CFB<0.10,"S",FD)
   FD     <- ifelse(CFB>0.90,"C",FD)
   CFC    <- .TFCcalc(FUELTYPE, CFL, CFB, SFC, PC, PDF,option="CFC")
-  if (output=="Secondary"|output=="All"){
+  if (output=="Secondary"|output=="All"|output =="S"|output =="A"){
       SF     <- ifelse (GS >= 70,10,exp(3.533 * (GS/100)^1.2))                                                                         # /* 39 */
       CSI    <- .CFBcalc(FUELTYPE,FMC,SFC,ROS,CBH,option="CSI")
       RSO    <- .CFBcalc(FUELTYPE,FMC,SFC,ROS,CBH,option="RSO")
@@ -135,8 +147,8 @@ fbp  <- function(input=NULL,output="Primary"){                                  
       TROS   <- ROS * (1-E)/(1-E*cos(THETA - RAZ))                                                                                       #/* note: this is the old method using the focus as the ignition point */
     #//   TROS <- ROSthetacalc(ROS, FROS, BROS, THETA)                                                                                   #MARC: what is this?
       ROSt   <- ifelse(ACCEL==0,ROS,.ROStcalc(FUELTYPE, ROS, HR, CFB))
-      FROSt  <- ifelse(ACCEL==0,FROS,.FROScalc(ROSt, BROSt, LBt))
       BROSt  <- ifelse(ACCEL==0,BROS,.ROStcalc(FUELTYPE, BROS, HR, CFB))
+      FROSt  <- ifelse(ACCEL==0,FROS,.FROScalc(ROSt, BROSt, LBt))
       TROSt  <- ifelse(ACCEL==0,TROS,ROSt * (1.-sqrt(1.-1./LBt/LBt))/(1.-sqrt(1.-1./LBt/LBt)*cos(THETA - RAZ)))                          #/* note: this is the old method using the focus as the ignition point */
       FCFB   <- ifelse(CFL==0,0,ifelse(FUELTYPE %in% c("C6"),0,.CFBcalc(FUELTYPE, FMC, SFC, FROS, CBH)))
       BCFB   <- ifelse(CFL==0,0,ifelse(FUELTYPE %in% c("C6"),0,.CFBcalc(FUELTYPE, FMC, SFC, BROS, CBH)))
@@ -150,43 +162,54 @@ fbp  <- function(input=NULL,output="Primary"){                                  
       TFI    <- .FIcalc(TTFC, TROS)
   
     #/* For now... */
-      TI     <- 0
-      FTI    <- 0
-      BTI    <- 0
-      TTI    <- 0
       HROSt  <- ifelse(HR < 0,-ROSt,ROSt)
       FROSt  <- ifelse(HR < 0,-FROSt,FROSt)
       BROSt  <- ifelse(HR < 0,-BROSt,BROSt)
       TROSt  <- ifelse(HR < 0,-TROSt,TROSt)
+      a1<-0.115-(18.8*CFB^2.5*exp(-8*CFB))
+      TI<-log(1-RSO/ROS)/(-a1)
+      
+      a2<-0.115-(18.8*FCFB^2.5*exp(-8*FCFB))
+      FTI<-log(1-RSO/FROS)/(-a2)
+      
+      a3<-0.115-(18.8*BCFB^2.5*exp(-8*BCFB))
+      BTI<-log(1-RSO/BROS)/(-a3)
+      
+      a4<-0.115-(18.8*TCFB^2.5*exp(-8*TCFB))
+      TTI<-log(1-RSO/TROS)/(-a4)
+      
+      DH=ROS*HR
+      DB=BROS*HR
+      DF=(DH+DB)/(LBt*2)
     }
   
   if (exists("ID")){
     ID<-ID
     #if(!is.null(input)) detach(input)
-    if (output == "Primary"){
+    if (output == "Primary"|output == "P"){
         FBP    <- data.frame(ID,CFB,CFC,HFI,RAZ,ROS,SFC,TFC)
         FBP[,2:ncol(FBP)]<-apply(FBP[,2:ncol(FBP)],2,function(.x) ifelse(FUELTYPE %in% c("WA","NF"),0,.x))
         FBP} else
-    if (output == "Secondary"){
-        FBP    <- data.frame(ID,BE,SF,ISI,FMC,D0,RSO,CSI,FROS,BROS,TROS,HROSt,FROSt,BROSt,TROSt,FCFB,BCFB,TCFB,FFI,BFI,TFI,FTFC,BTFC,TTFC,TI,FTI,BTI,TTI,LB,LBt,WSV)
+    if (output == "Secondary"|output == "S"){
+        FBP    <- data.frame(ID,BE,SF,ISI,FMC,D0,RSO,CSI,FROS,BROS,HROSt,FROSt,BROSt,FCFB,BCFB,FFI,BFI,FTFC,BTFC,TI,FTI,BTI,LB,LBt,WSV,DH,DB,DF,TROS,TROSt,TCFB,TFI,TTFC,TTI)
         FBP[,2:ncol(FBP)]<-apply(FBP[,2:ncol(FBP)],2,function(.x) ifelse(FUELTYPE %in% c("WA","NF"),0,.x))
         FBP} else
-    if (output == "All") {
-        FBP    <- data.frame(ID,CFB,CFC,HFI,RAZ,ROS,SFC,TFC,BE,SF,ISI,FMC,D0,RSO,CSI,FROS,BROS,TROS,HROSt,FROSt,BROSt,TROSt,FCFB,BCFB,TCFB,FFI,BFI,TFI,FTFC,BTFC,TTFC,TI,FTI,BTI,TTI,LB,LBt,WSV)
+    if (output == "All"|output == "A") {
+        FBP    <- data.frame(ID,CFB,CFC,HFI,RAZ,ROS,SFC,TFC,BE,SF,ISI,FMC,D0,RSO,CSI,FROS,BROS,HROSt,FROSt,BROSt,FCFB,BCFB,FFI,BFI,FTFC,BTFC,TI,FTI,BTI,LB,LBt,WSV,DH,DB,DF,TROS,TROSt,TCFB,TFI,TTFC,TTI)
         FBP[,2:ncol(FBP)]<-apply(FBP[,2:ncol(FBP)],2,function(.x) ifelse(FUELTYPE %in% c("WA","NF"),0,.x))
         FBP}} else {
         ID     <- row.names(input)
         #if(!is.null(input)) detach(input)
-        if (output == "Primary"){
+        if (output == "Primary"|output == "P"){
             FBP    <- data.frame(ID,CFB,CFC,HFI,RAZ,ROS,SFC,TFC)
             FBP[,2:ncol(FBP)]<-apply(FBP[,2:ncol(FBP)],2,function(.x) ifelse(FUELTYPE %in% c("WA","NF"),0,.x))
             FBP} else
-        if (output == "Secondary"){
-            FBP    <- data.frame(ID,BE,SF,ISI,FMC,D0,RSO,CSI,FROS,BROS,TROS,HROSt,FROSt,BROSt,TROSt,FCFB,BCFB,TCFB,FFI,BFI,TFI,FTFC,BTFC,TTFC,TI,FTI,BTI,TTI,LB,LBt,WSV)
+        if (output == "Secondary"|output == "S"){
+            FBP    <- data.frame(ID,BE,SF,ISI,FMC,D0,RSO,CSI,FROS,BROS,HROSt,FROSt,BROSt,FCFB,BCFB,FFI,BFI,FTFC,BTFC,TI,FTI,BTI,LB,LBt,WSV,DH,DB,DF,TROS,TROSt,TCFB,TFI,TTFC,TTI)
             FBP[,2:ncol(FBP)]<-apply(FBP[,2:ncol(FBP)],2,function(.x) ifelse(FUELTYPE %in% c("WA","NF"),0,.x))
             FBP} else
-        if (output == "All") {
-            FBP    <- data.frame(ID,CFB,CFC,HFI,RAZ,ROS,SFC,TFC,BE,SF,ISI,FMC,D0,RSO,CSI,FROS,BROS,TROS,HROSt,FROSt,BROSt,TROSt,FCFB,BCFB,TCFB,FFI,BFI,TFI,FTFC,BTFC,TTFC,TI,FTI,BTI,TTI,LB,LBt,WSV)
+        if (output == "All"|output == "A") {
+            FBP    <- data.frame(ID,CFB,CFC,HFI,RAZ,ROS,SFC,TFC,BE,SF,ISI,FMC,D0,RSO,CSI,FROS,BROS,HROSt,FROSt,BROSt,FCFB,BCFB,FFI,BFI,FTFC,BTFC,TI,FTI,BTI,LB,LBt,WSV,DH,DB,DF,TROS,TROSt,TCFB,TFI,TTFC,TTI)
             FBP[,2:ncol(FBP)]<-apply(FBP[,2:ncol(FBP)],2,function(.x) ifelse(FUELTYPE %in% c("WA","NF"),0,.x))
             FBP}}
 }
