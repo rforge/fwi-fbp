@@ -6,7 +6,7 @@ fbp  <- function(input=NULL,output="Primary"){                                  
   if(is.null(input)){                                                                                                                     # default input data is NULL
     FUELTYPE     <- "C2"; ACCEL <- 0; DJ <- 180;D0 <- 0; ELV <- 100; BUIEFF <- 1; HR <- 0; FFMC <- 90
     ISI          <- 0;BUI <- 60; WS <- 10; WD <- 0; GS  <- 0; ASPECT <- 0;PC <- 50; PDF <- 35; CC <- 80
-    GFL          <- 0.35; CBH <- 3; CFL <- -1; LAT <- 55; LONG <- -120; FMC <- 0; THETA <- 0
+    GFL          <- 0.35; CBH <- 3; CFL <- 0; LAT <- 55; LONG <- -120; FMC <- 0; THETA <- 0
     input        <- as.data.frame(cbind(ACCEL,DJ,D0,ELV,BUIEFF,HR,FFMC,ISI,BUI,WS,WD,GS,ASPECT,PC,PDF,CC,GFL,CBH,CFL,LAT,LONG,FMC,THETA))
     input        <- cbind(FUELTYPE,input)
     input[,1]    <- as.character(input[,1])
@@ -20,12 +20,12 @@ fbp  <- function(input=NULL,output="Primary"){                                  
     n0 <- nrow(input)
     if(!exists("FUELTYPE")|is.null(FUELTYPE)) FUELTYPE<-rep("C2",n0);if(!exists("FFMC")|is.null(FFMC)) FFMC<-rep(90,n0);if(!exists("BUI")|is.null(BUI)) BUI<-rep(60,n0)
     if(!exists("WS")|is.null(WS)) WS<-rep(10,n0);if(!exists("WD")|is.null(WD)) WD<-rep(0,n0);if(!exists("FMC")|is.null(FMC)) FMC<-rep(0,n0);if(!exists("GS")|is.null(GS)) GS<-rep(0,n0)
-    if(!exists("LAT")|is.null(LAT)) LAT<-rep(55,n0);if(!exists("LONG")|is.null(LONG)) LONG<-rep(-120,n0);if(!exists("ELV")|is.null(ELV)) ELV<-rep(-1,n0)
+    if(!exists("LAT")|is.null(LAT)) LAT<-rep(55,n0);if(!exists("LONG")|is.null(LONG)) LONG<-rep(-120,n0);if(!exists("ELV")|is.null(ELV)) ELV<-rep(100,n0)
     if(!exists("SD")|is.null(SD)) SD<-rep(0,n0);if(!exists("SH")|is.null(SH)) SH<-rep(0,n0);if(!exists("DJ")|is.null(DJ)) DJ<-rep(180,n0);if(!exists("D0")|is.null(D0)) D0<-rep(0,n0)
     if(!exists("HR")|is.null(HR)) HR<-rep(0,n0);if(!exists("PC")|is.null(PC)) PC<-rep(50,n0);if(!exists("PDF")|is.null(PDF)) PDF<-rep(35,n0);if(!exists("GFL")|is.null(GFL)) GFL<-rep(0.35,n0)
     if(!exists("CC")|is.null(CC)) CC<-rep(80,n0);if(!exists("THETA")|is.null(THETA)) THETA<-rep(0,n0);if(!exists("ACCEL")|is.null(ACCEL)) ACCEL<-rep(0,n0)
     if(!exists("ASPECT")|is.null(ASPECT)) ASPECT<-rep(0,n0);if(!exists("BUIEFF")|is.null(BUIEFF)) BUIEFF<-rep(1,n0);if(!exists("CBH")|is.null(CBH)) CBH<-rep(3,n0)
-    if(!exists("CFL")|is.null(CFL)) CFL<-rep(-1,n0);if(!exists("ISI")|is.null(ISI)) ISI<-rep(0,n0)
+    if(!exists("CFL")|is.null(CFL)) CFL<-rep(0,n0);if(!exists("ISI")|is.null(ISI)) ISI<-rep(0,n0)
     
     ### Data cleaning up
     WD     <- WD * pi/180
@@ -72,6 +72,7 @@ fbp  <- function(input=NULL,output="Primary"){                                  
   }
 
   FUELTYPE <- sub("-","",FUELTYPE)
+  FUELTYPE <- sub(" ","",FUELTYPE)
 
   # Convert time from hours to minutes */
   HR     <- HR*60.
@@ -121,7 +122,6 @@ fbp  <- function(input=NULL,output="Primary"){                                  
   ROS    <- ifelse(FUELTYPE %in% c("C6"),.C6calc(FUELTYPE,ISI,BUI,FMC,SFC,CBH,option="ROS"),.ROScalc(FUELTYPE,ISI,BUI,FMC,SFC,PC,PDF,CC,CBH))
   CFB    <- ifelse(FUELTYPE %in% c("C6"),.C6calc(FUELTYPE,ISI,BUI,FMC,SFC,CBH,option="CFB"),ifelse(CFL>0,.CFBcalc(FUELTYPE,FMC,SFC,ROS,CBH),0))
   
-    #don't think we need this line - done in the line above
   #CFB    <- ifelse(CFL==0,0,.CFBcalc(FUELTYPE, FMC, SFC, ROS, CBH))
   
   TFC    <- .TFCcalc(FUELTYPE, CFL, CFB, SFC, PC, PDF)
@@ -166,6 +166,7 @@ fbp  <- function(input=NULL,output="Primary"){                                  
       FROSt  <- ifelse(HR < 0,-FROSt,FROSt)
       BROSt  <- ifelse(HR < 0,-BROSt,BROSt)
       TROSt  <- ifelse(HR < 0,-TROSt,TROSt)
+
       a1<-0.115-(18.8*CFB^2.5*exp(-8*CFB))
       TI<-log(1-RSO/ROS)/(-a1)
       
