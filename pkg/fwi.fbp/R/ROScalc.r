@@ -22,8 +22,8 @@
      RSI      <- ifelse(FUELTYPE %in% c("M4"),PDF/100* RSI_m4 +
                 0.2*(1-PDF/100)* .ROScalc(rep("D1",length(ISI)),ISI,NoBUI,FMC,SFC,PC,PDF,CC,CBH),RSI)                                   # /* 31 - 2009 */
      CF       <- rep(-99,length(ISI))
-     CF       <- ifelse(FUELTYPE %in% c("O1a","O1b"),ifelse(CC < 58.8,0.005*(exp(0.061*CC)-1),0.176 + 0.02*(CC-58.8)),CF)              # /* 35b - 2009 */
-     RSI      <- ifelse(FUELTYPE %in% c("O1a","O1b"),a[FUELTYPE] * ((1 - exp(-b[FUELTYPE] * ISI))**c0[FUELTYPE])* CF ,RSI)             # /* 36 */
+     CF       <- ifelse(FUELTYPE %in% c("O1A","O1B"),ifelse(CC < 58.8,0.005*(exp(0.061*CC)-1),0.176 + 0.02*(CC-58.8)),CF)              # /* 35b - 2009 */
+     RSI      <- ifelse(FUELTYPE %in% c("O1A","O1B"),a[FUELTYPE] * ((1 - exp(-b[FUELTYPE] * ISI))**c0[FUELTYPE])* CF ,RSI)             # /* 36 */
 #     RSI      <- ifelse(FUELTYPE %in% c("C6"),.C6calc(FUELTYPE,ISI,BUI,FMC,SFC,CBH,option="RSI"),RSI)
      ROS      <- ifelse(FUELTYPE %in% c("C6"),.C6calc(FUELTYPE,ISI,BUI,FMC,SFC,CBH,option="ROS"),.BEcalc(FUELTYPE,BUI)*RSI )
 #     ROS      <- BEcalc(FUELTYPE,BUI)*RSI
