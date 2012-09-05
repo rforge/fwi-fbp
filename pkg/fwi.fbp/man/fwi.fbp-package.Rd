@@ -12,7 +12,7 @@ The fwi.fbp package is to allow R users to calculate the outputs of the two main
 \tabular{ll}{
 Package: \tab fwi-fbp\cr
 Type: \tab Package\cr
-Version: \tab 0.01\cr
+Version: \tab 0.33\cr
 Date: \tab 2012-08-12\cr
 License: \tab GPL-2\cr
 }

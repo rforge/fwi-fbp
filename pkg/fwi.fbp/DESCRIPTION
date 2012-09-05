@@ -1,7 +1,7 @@
 Package: fwi.fbp
 Type: Package
 Title: FWI System and FBP System Calculations
-Version: 1.0
+Version: 0.33
 Date: 2012-08-24
 Author: Xianli Wang, Alan Cantin, Marc-Andr&eacute; Parisien, Mike Wotton, Kerry Anderson, and Mike Flannigan
 Maintainer: Xianli Wang <Xianli.Wang@ales.ualberta.ca>, Alan Cantin <Alan.Cantin@NRCan-RNCan.gc.ca>
