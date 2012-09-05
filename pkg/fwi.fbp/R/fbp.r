@@ -110,7 +110,7 @@ fbp  <- function(input=NULL,output="Primary"){                                  
   names(CFLs)<-c("C1","C2","C3","C4","C5","C6","C7","D1","M1","M2","M3","M4","S1","S2","S3","O1A","O1B")
   CFL    <- ifelse(CFL <= 0|CFL>2.0|is.na(CFL),CFLs[FUELTYPE],CFL)
   
-  FMC    <- ifelse(FMC <= 0 | FMC > 120 | is.na(FMC),FMCcalc(LAT, LONG, ELV, DJ, D0),FMC)
+  FMC    <- ifelse(FMC <= 0 | FMC > 120 | is.na(FMC),.FMCcalc(LAT, LONG, ELV, DJ, D0),FMC)
   SFC    <- .SFCcalc(FUELTYPE, FFMC, BUI, PC, GFL)
   BUI    <- ifelse(BUIEFF !=1,0,BUI)
   WSV0   <- .Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS,SAZ, FMC, SFC, PC, PDF, CC, CBH,ISI,output="WSV")                                     #/* This turns off BUI effect */
