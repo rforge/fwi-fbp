@@ -62,12 +62,12 @@ fbp  <- function(input=NULL,output="Primary"){                                  
     GFL    <- ifelse(is.na(GFL)|GFL <= 0 | GFL > 100,0.35,GFL)                                                                                    # changed from 0.3 to 0.35, pg 6 - 2009 */
     LAT    <- ifelse(LAT < -90 | LAT > 90,0,LAT)
     LAT    <- ifelse(is.na(LAT),55,LAT)
-    LONG    <- ifelse(LONG < -180 | LONG > 360,0,LONG)
-    LONG    <- ifelse(is.na(LONG),-120,LONG)
-    THETA  <- ifelse(is.na(THETA)|THETA  < -2*pi | THETA > 2*pi,0,THETA)
-    SD     <- ifelse(SD < 0 | SD > 100000, -999,SD)
-    SD     <- ifelse(is.na(SD), 0,SD)
-    SH     <- ifelse(SH < 0 | SH > 100, -999,SH)
+    LONG   <- ifelse(LONG < -180 | LONG > 360,0,LONG)
+    LONG   <- ifelse(is.na(LONG),-120,LONG)
+    THETA  <- ifelse(is.na(THETA)|THETA < -2*pi | THETA > 2*pi,0,THETA)
+    SD     <- ifelse(SD < 0 | SD > 100000,-999,SD)
+    SD     <- ifelse(is.na(SD),0,SD)
+    SH     <- ifelse(SH < 0 | SH > 100,-999,SH)
     SH     <- ifelse(is.na(SH),0,SH)
   }
 
@@ -168,25 +168,22 @@ fbp  <- function(input=NULL,output="Primary"){                                  
       TROSt  <- ifelse(HR < 0,-TROSt,TROSt)
 
       a1<-0.115-(18.8*CFB^2.5*exp(-8*CFB))
-      TI<-log(1-RSO/ROS)/(-a1)
+      TI<-ifelse(RSO<ROS,log(1-RSO/ROS)/(-a1),0)
       
       a2<-0.115-(18.8*FCFB^2.5*exp(-8*FCFB))
-      FTI<-log(1-RSO/FROS)/(-a2)
+      FTI<-ifelse(RSO<FROS,log(1-RSO/FROS)/(-a2),0)
       
       a3<-0.115-(18.8*BCFB^2.5*exp(-8*BCFB))
-      BTI<-log(1-RSO/BROS)/(-a3)
+      BTI<-ifelse(RSO<BROS,log(1-RSO/BROS)/(-a3),0)
       
       a4<-0.115-(18.8*TCFB^2.5*exp(-8*TCFB))
-      TTI<-log(1-RSO/TROS)/(-a4)
+      TTI<-ifelse(RSO<TROS,log(1-RSO/TROS)/(-a4),0)
       
       DH=ROS*HR
       DB=BROS*HR
       DF=(DH+DB)/(LBt*2)
     }
-  
-  if (exists("ID")){
-    ID<-ID
-    #if(!is.null(input)) detach(input)
+  if (exists("ID")) ID<-ID else ID <- row.names(input)  
     if (output == "Primary"|output == "P"){
         FBP    <- data.frame(ID,CFB,CFC,HFI,RAZ,ROS,SFC,TFC)
         FBP[,2:ncol(FBP)]<-apply(FBP[,2:ncol(FBP)],2,function(.x) ifelse(FUELTYPE %in% c("WA","NF"),0,.x))
@@ -198,19 +195,5 @@ fbp  <- function(input=NULL,output="Primary"){                                  
     if (output == "All"|output == "A") {
         FBP    <- data.frame(ID,CFB,CFC,HFI,RAZ,ROS,SFC,TFC,BE,SF,ISI,FMC,D0,RSO,CSI,FROS,BROS,HROSt,FROSt,BROSt,FCFB,BCFB,FFI,BFI,FTFC,BTFC,TI,FTI,BTI,LB,LBt,WSV,DH,DB,DF,TROS,TROSt,TCFB,TFI,TTFC,TTI)
         FBP[,2:ncol(FBP)]<-apply(FBP[,2:ncol(FBP)],2,function(.x) ifelse(FUELTYPE %in% c("WA","NF"),0,.x))
-        FBP}} else {
-        ID     <- row.names(input)
-        #if(!is.null(input)) detach(input)
-        if (output == "Primary"|output == "P"){
-            FBP    <- data.frame(ID,CFB,CFC,HFI,RAZ,ROS,SFC,TFC)
-            FBP[,2:ncol(FBP)]<-apply(FBP[,2:ncol(FBP)],2,function(.x) ifelse(FUELTYPE %in% c("WA","NF"),0,.x))
-            FBP} else
-        if (output == "Secondary"|output == "S"){
-            FBP    <- data.frame(ID,BE,SF,ISI,FMC,D0,RSO,CSI,FROS,BROS,HROSt,FROSt,BROSt,FCFB,BCFB,FFI,BFI,FTFC,BTFC,TI,FTI,BTI,LB,LBt,WSV,DH,DB,DF,TROS,TROSt,TCFB,TFI,TTFC,TTI)
-            FBP[,2:ncol(FBP)]<-apply(FBP[,2:ncol(FBP)],2,function(.x) ifelse(FUELTYPE %in% c("WA","NF"),0,.x))
-            FBP} else
-        if (output == "All"|output == "A") {
-            FBP    <- data.frame(ID,CFB,CFC,HFI,RAZ,ROS,SFC,TFC,BE,SF,ISI,FMC,D0,RSO,CSI,FROS,BROS,HROSt,FROSt,BROSt,FCFB,BCFB,FFI,BFI,FTFC,BTFC,TI,FTI,BTI,LB,LBt,WSV,DH,DB,DF,TROS,TROSt,TCFB,TFI,TTFC,TTI)
-            FBP[,2:ncol(FBP)]<-apply(FBP[,2:ncol(FBP)],2,function(.x) ifelse(FUELTYPE %in% c("WA","NF"),0,.x))
-            FBP}}
+        FBP} 
 }
