@@ -4,19 +4,19 @@
 Fire Behavior Prediction System function
 }
 \description{
-fbp calculates the outputs from the Fire Behavior Prediction (FBP) System (Forestry Canada Fire Danger Group 1992) based on given fire weather conditions (from the Fire Weather Index (FWI) System (Van Wagner 1987)), fuel type, and slope (optional).  Fire weather, for the purpose of FBP System calculation, comprises daily weather observations of wind speed and wind direction, and associated outputs from the Fire Weather Index System including fine fuel moisture content (FFMC) and buildup index (BUI).  FWI System components can be calculated with the sister functions fwi and fwiBAT. 
+fbp calculates the outputs from the Canadian Forest Fire Behavior Prediction (FBP) System (Forestry Canada Fire Danger Group 1992) based on given fire weather and fuel moisture conditions (from the Canadian Forest Fire Weather Index (FWI) System (Van Wagner 1987)),  fuel type, date, and slope. Fire weather, for the purpose of FBP System calculation, comprises observations of 10 m wind speed and direction at the time of the fire, and two associated outputs from the Fire Weather Index System, the Fine Fuel Moisture Content (ffmc) and Buildup Index (bui). FWI System components can be calculated with the sister functions \code{\link{fwi}} and \code{\link{fwiBAT}}.
 }
 \usage{
-fbp(input = NULL, output = "Primary")
+fbp(input, output="Primary")
 }
 \arguments{
   \item{input}{
-    The input data, a dataframe containing fuel types, fire weather component, and slope (see below).  These inputs consist of daily record(s) for a single point (e.g. one weather station) or multiple points (multiple weather stations or a gridded surface).  All input variables have to be named exactly as listed below; however, the variables do not have to be in any particular order. Fuel type is of type character; other arguments are numeric.  Missing values in numeric variables could either be assigned as NA or -1.
+    The input data, a dataframe containing fuel types, fire weather component, and slope (see below). Each vector of inputs defines a single FBP System prediction for a single fuel type and set of weather conditions. The dataframe can be used to evaluate the FBP System for a single fuel type and instant in time, or multiple records for a single point (e.g., one weather station, either hourly or daily for instance) or multiple points (multiple weather stations or a gridded surface). All input variables have to be named as listed below, but they are case insensitive, and do not have to be in any particular order. Fuel type is of type character; other arguments are numeric. Missing values in numeric variables could either be assigned as NA or -1.
     
     \tabular{lll}{
         \bold{Inputs} \tab \bold{Full names of inputs} \tab \bold{Defaults}\cr
-        \var{id} \tab Unique identifier of a weather station or spatial point (no restriction on data type) \tab N/A\cr
-        \var{FuelType} \tab FBP System Fuel Types including "C1", "C2", "C3", "C4", "C5", "C6", "C7", "D1", "M1", "M2", "M3", "M4", "S1", "S2", "S3", "O1a", and "O1b" \tab "C2"\cr
+        \var{id} \tab Unique identifier of a weather station or spatial point (no restriction on data type). Will use row.names of the Inputs dataset if not specified \tab N/A\cr
+        \var{FuelType} \tab FBP System Fuel Types including "C-1", "C-2", "C-3", "C-4", "C-5", "C-6", "C-7", "D-1", "M-1", "M-2", "M-3", "M-4", "S-1", "S-2", "S-3", "O-1a", and "O-1b". "WA" and "NF" stand for "water" and "non-fuel", respectively. The "-" in the Fuel Type names could be omitted, and the Fuel Types names are also case-insensitive.  \tab "C2"\cr
         \var{LAT} \tab Latitude [decimal degrees] \tab 55\cr
         \var{LON} \tab Longitude [decimal degrees] \tab -120\cr
         \var{ELV} \tab Elevation [meters above sea level] \tab 100\cr
@@ -29,8 +29,8 @@ fbp(input = NULL, output = "Primary")
         \var{PC*} \tab Percent Conifer for M1/M2 [percent] \tab 50\cr
         \var{PDF*} \tab Percent Dead Fir for M3/M4 [percent] \tab 35\cr
         \var{cc*} \tab Percent Cured for O1a/O1b [percent] \tab 80\cr
-        \var{GFL*} \tab Grass Fuel Load [kg/m^2] \tab 3\cr
-        \var{CBH**} \tab Crown to Base Height [m] \tab 7\cr
+        \var{GFL*} \tab Grass Fuel Load [kg/m^2] \tab 0.35\cr
+        \var{CBH**} \tab Crown to Base Height [m] \tab 3\cr
         \var{WD**} \tab Wind direction [decimal degrees] \tab 0\cr
         \var{Accel**} \tab 1 = point, 0 = line \tab 0\cr
         \var{BUIEff**} \tab Buildup Index effect:1=yes, 0=no \tab 1\cr
@@ -38,7 +38,7 @@ fbp(input = NULL, output = "Primary")
         \var{hr**} \tab Hours since ignition \tab 0\cr
         \var{ISI**} \tab Initial spread index \tab 0\cr
         \var{CFL**} \tab Crown Fuel Load [kg/m^2] \tab -1\cr
-        \var{FMC**} \tab Foliar Moisture Content if known \tab 0\cr
+        \var{FMC**} \tab Foliar Moisture Content if known [percent] \tab 0\cr
         \var{SH**} \tab C6 Fuel Type Stand Height [m] \tab 0\cr
         \var{SD**} \tab C6 Fuel Type Stand Density [stems/ha] \tab 0\cr
         \var{theta**} \tab Elliptical direction of calculation [degree] \tab 0\cr
@@ -54,65 +54,78 @@ fbp(input = NULL, output = "Primary")
         \var{All} \tab 37\cr
     }
   }
+  * Variables associated with certain fuel types. These could be skipped if relevant fuel types do not appear in the input data. 
+ **Variables that could be ignored without causing major impacts to the primary outputs.
+
 }
 \details{
-The FBP System was updated in 2009 (Wotton et al 2009) with several additional equations that were initially not included in the system.  The fbp function took consideration of both versions of the system and tried to provide a complete suite of fire behavior prediction variables.
+The Canadian Forest Fire Behavior Prediction (FBP) System (Forestry Canada Fire Danger Group. 1992) is a subsystem of the Canadian Forest Fire Danger Rating System, which also includes the Canadian Forest Fire Weather Index (FWI) System. The FBP System provides quantitative estimates of head fire spread rate, fuel consumption, fire intensity, and a basic fire description (e.g., surface, crown) for 16 different important forest and rangeland types across Canada. Using a simple conceptual model of the growth of a point ignition as an ellipse through uniform fuels and under uniform weather conditions, the system gives, as a set of secondary outputs,  estimates of flank and back fire behavior and consequently fire area perimeter length and growth rate. 
+
+The FBP System evolved since the mid-1970s from a series of regionally developed burning indexes to an interim edition of the nationally develop FBP system issued in 1984. Fire behavior models for spread rate and fuel consumption were derived from a database of over 400 experimental, wild and prescribed fire observations. The FBP System, while providing quantitative predictions of expected fire behavior is intended to supplement the experience and judgment of operational fire managers (Hirsch, 1996). 
+
+The FBP System was updated with some minor corrections and revisions in 2009 (Wotton et al 2009) with several additional equations that were initially not included in the system. This fbp function included these updates and corrections to the original equations and tried to provide a complete suite of fire behavior prediction variables.
 
 Default values of optional input variables provide a reasonable mid-range setting. 
 
-Latitude, longitude, elevation, and the date are used to calculate foliar moisture content, as prescribed by the FBP System.  Note that FBP System are not highly sensitive to changes in foliar moisture content.  For the Foliar Moisture Content (FMC), if the foliar moisture content is specified, the fbp function will use this value directly rather than calculate it.  This is also true to other input variables.
+Latitude, longitude, elevation, and the date are used to calculate foliar moisture content, as prescribed by the FBP System. For the Foliar Moisture Content (FMC), if the foliar moisture content is specified, the fbp function will use this value directly rather than calculate it. This is also true to other input variables.
 
 }
 \value{
-  fbp returns a dataframe with primary, secondary, or all of the primary and secondary outputs (output=ALL). 
+  fbp returns a dataframe with primary, secondary, or all output variables, a combination of the primary and secondary outputs. 
   
   Primary FBP output includes the following 7 variables:
-  \item{CFB }{Crown Fraction Burned [percent]}
+  \item{CFB }{Crown Fraction Burned}
   \item{CFC }{Crown Fuel Consumption [kg/m^2]}
   \item{HFI }{Head Fire Intensity [kW/m]}
-  \item{RAZ }{Spread direction azimuth}
+  \item{RAZ }{Spread direction azimuth [degrees]}
   \item{ROS }{Rate of Spread [m/min]}
   \item{SFC }{Surface Fuel Consumption [kg/m^2]}
   \item{TFC }{Total Fuel Consumption [kg/m^2]}
   
-  Secondary FBP System outputs include the following 30 variables.  Some optional inputs must be provided in order to calculate secondary outputs (see Arguments). 
+  Secondary FBP System outputs include the following 30 variables. In order to calculate the reliable secondary outputs, depending on the outputs, optional inputs may have to be provided.  
   \item{BE }{BUI effect on spread rate}
   \item{SF }{Slope Factor (multiplier for ROS increase upslope)}
   \item{ISI }{Initial Spread Index}
-  \item{FMC }{Foliar Moisture Content}
+  \item{FMC }{Foliar Moisture Content [percent]}
   \item{Do }{Julian Date of minimum FMC}
   \item{RSO }{Critical spread rate for crowning [m/min]}
   \item{CSI }{Critical surface intensity for crowning [kW/m]}
-  \item{FROS }{Flank Rate of Spread [m/min]}
-  \item{BROS }{Back Rate of Spread [m/min]}
-  \item{TROS }{Rate of Spread at angle theta [m/min]}
-  \item{HROSt }{Head Rate of Spread at time t [m/min]}
-  \item{FROSt }{Flank Rate of Spread at time t [m/min]}
-  \item{BROSt }{Back Rate of Spread at time t [m/min]}
-  \item{TROSt }{Rate of Spread at angle theta at time t [m/min]}
-  \item{FCFB }{Flank Crown Fraction Burned [percent]}
-  \item{BCFB }{Back Crown Fraction Burned [percent]}
-  \item{TCFB }{Crown Fraction Burned at angle theta [percent]}
-  \item{FFI }{Front Head Fire Intensity [kW/m]}
-  \item{BFI }{Back Head Fire Intensity [kW/m]}
-  \item{TFI }{Total Head Fire Intensity [kW/m]}
-  \item{FTFC }{Flank Total Fuel Consumption [kg/m^2]  }
-  \item{BTFC }{Back Total Fuel Consumption [kg/m^2]  }
-  \item{TTFC }{Total Fuel Consumption at angle theta [kg/m^2]  }
-  \item{TI }{Time of Crown Fire Initiation [hrs since ignition]}
-  \item{FTI }{Time of Flank Crown Fire initiation [hrs since ignition]}
-  \item{BTI }{Time of Back Crown Fire initiation [hrs since ignition]}
-  \item{TTI }{Time of Crown Fire initiation at angle theta [hrs since ignition]}
+  \item{FROS }{Flank Fire Rate of Spread [m/min]}
+  \item{BROS }{Back Fire Rate of Spread [m/min]}
+  \item{HROSt }{Head Fire Rate of Spread at time t [m/min]}
+  \item{FROSt }{Flank Fire Rate of Spread at time t [m/min]}
+  \item{BROSt }{Back Fire Rate of Spread at time t [m/min]}
+  \item{FCFB }{Flank Fire Crown Fraction Burned}
+  \item{BCFB }{Back Fire Crown Fraction Burned}
+  \item{FFI }{Flank Fire Intensity [kW/m]}
+  \item{BFI }{Back Fire Intensity [kW/m]}
+  \item{FTFC }{Flank Fire Total Fuel Consumption [kg/m^2]  }
+  \item{BTFC }{Back Fire Total Fuel Consumption [kg/m^2]  }
+  \item{DH }{Head Fire Spreading Distance [m] }
+  \item{DB }{Back Fire Spreading Distance [m] }
+  \item{DF }{Flank Fire Spreading Distance [m] }
+  \item{TI }{Time to Crown Fire Initiation [hrs since ignition] }
+  \item{FTI }{Time to Flank Crown Fire initiation [hrs since ignition]}
+  \item{BTI }{Time to Back Crown Fire initiation [hrs since ignition]}
   \item{LB }{Length to Breadth ratio}
-  \item{LBt }{Length to Breadth ratio after elapsed time t [m]}
+  \item{LBt }{Length to Breadth ratio after elapsed time t }
   \item{WSV }{Net vectored wind speed [m/hr]}
+  \item{TROS* }{Rate of Spread at angle theta [m/min] }
+  \item{TROSt* }{Rate of Spread at angle theta at time t [m/min] }
+  \item{TCFB* }{Crown Fraction Burned at angle theta }
+  \item{TFI* }{Fire Intensity at angle theta [kW/m] }
+  \item{TTFC* }{Total Fuel Consumption at angle theta [kg/m^2] }
+  \item{TTI* }{Time to Crown Fire initiation at angle theta [hrs since ignition] }
+
+  
+  
 }
 \references{
 1.  Hirsch K.G. 1996. Canadian forest fire behavior prediction (FBP) system: user's guide. Nat. Resour. Can., Can. For. Serv., Northwest Reg., North. For. Cent., Edmonton, Alberta. Spec. Rep. 7. 122p.
 
-2.  Forestry Canada Fire Danger Group. 1992. Development and structure of the Canadian Forest Fire Behavior Prediction System. Forestry Canada, Ottawa, Ontario Information Report ST-X-3. 63 p.
+2.  Forestry Canada Fire Danger Group. 1992. Development and structure of the Canadian Forest Fire Behavior Prediction System. Forestry Canada, Ottawa, Ontario Information Report ST-X-3. 63 p. \url{http://cfs.nrcan.gc.ca/pubwarehouse/pdfs/10068.pdf}
 
-3.  Wotton, B.M., Alexander, M.E., Taylor, S.W. 2009. Updates and revisions to the 1992 Canadian forest fire behavior prediction system. Nat. Resour. Can., Can. For. Serv., Great Lakes For. Cent., Sault Ste. Marie, Ontario, Canada. Information Report GLC-X-10, 45p.
+3.  Wotton, B.M., Alexander, M.E., Taylor, S.W. 2009. Updates and revisions to the 1992 Canadian forest fire behavior prediction system. Nat. Resour. Can., Can. For. Serv., Great Lakes For. Cent., Sault Ste. Marie, Ontario, Canada. Information Report GLC-X-10, 45p. \url{http://publications.gc.ca/collections/collection_2010/nrcan/Fo123-2-10-2009-eng.pdf}
 }
 \author{
 Xianli Wang, Alan Cantin, Marc-Andre Parisien, Mike Wotton, Kerry Anderson, and Mike Flannigan
@@ -129,21 +142,31 @@ data(test_fbp,package="fwi.fbp")
 head(test_fbp)
 
 #Primary output (default)
-fbp(test_fbp)  
+fbp(test_fbp)
+#or
+fbp(test_fbp,output="Primary") 
+#or 
+fbp(test_fbp,"P")
 
 #Secondary output          
 fbp(test_fbp,"Secondary")
+#or
+fbp(test_fbp,"S")
 
 #All output          
 fbp(test_fbp,"All")
+#or
+fbp(test_fbp,"A")
 
-#little tests
-fbp(test_fbp[7,])    #Single record
-fbp(test_fbp[8:13,])  #Section of the records
+#For a single record:
+fbp(test_fbp[7,])  	
+#For a section of the records:
+fbp(test_fbp[8:13,])	
 
 #fbp function produces the default values if no data is fed to
 #the function:
 fbp()
+
 }
 
 \keyword{ methods }
