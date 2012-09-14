@@ -91,17 +91,26 @@ data(test_fbp,package="fwi.fbp")
 head(test_fbp)
 
 #Primary output (default)
-fbp(test_fbp)  
+fbp(test_fbp)
+#or
+fbp(test_fbp,output="Primary") 
+#or 
+fbp(test_fbp,"P")
 
 #Secondary output          
 fbp(test_fbp,"Secondary")
+#or
+fbp(test_fbp,"S")
 
 #All output          
 fbp(test_fbp,"All")
+#or
+fbp(test_fbp,"A")
 
-#little tests
-fbp(test_fbp[7,])    #Single record
-fbp(test_fbp[8:13,])  #Section of the records
+#For a single record:
+fbp(test_fbp[7,])    
+#For a section of the records:
+fbp(test_fbp[8:13,])	
 
 #fbp function produces the default values if no data is fed to
 #the function:
