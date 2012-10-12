@@ -4,9 +4,9 @@ if(!is.na(charmatch("input",search()))) {detach(input)}
 output<-toupper(output)
 ### Here is the main function:
 if(is.null(input)){                                                                                                                     # default input data is NULL
-    FUELTYPE     <- "C2"; ACCEL <- 0; DJ <- 180;D0 <- 0; ELV <- 100; BUIEFF <- 1; HR <- 0; FFMC <- 90;
+    FUELTYPE     <- "C2"; ACCEL <- 0; DJ <- 180;D0 <- 0; ELV <- 0; BUIEFF <- 1; HR <- 1; FFMC <- 90;
     ISI          <- 0;BUI <- 60; WS <- 10; WD <- 0; GS  <- 0; ASPECT <- 0;PC <- 50; PDF <- 35; CC <- 80;
-    GFL          <- 0.35; CBH <- 3; CFL <- 0; LAT <- 55; LONG <- -120; FMC <- 0; THETA <- 0
+    GFL          <- 0.35; CBH <- 3; CFL <- 1; LAT <- 55; LONG <- -120; FMC <- 0; THETA <- 0
     input        <- as.data.frame(cbind(ACCEL,DJ,D0,ELV,BUIEFF,HR,FFMC,ISI,BUI,WS,WD,GS,ASPECT,PC,PDF,CC,GFL,CBH,CFL,LAT,LONG,FMC,THETA))
     input        <- cbind(FUELTYPE,input)
     input[,"FUELTYPE"]      <- as.character(input[,"FUELTYPE"])
@@ -19,12 +19,12 @@ if(is.null(input)){                                                             
     n0 <- nrow(input)
     if(!exists("FUELTYPE")|is.null(FUELTYPE)) FUELTYPE<-rep("C2",n0);if(!exists("FFMC")|is.null(FFMC)) FFMC<-rep(90,n0);if(!exists("BUI")|is.null(BUI)) BUI<-rep(60,n0)
     if(!exists("WS")|is.null(WS)) WS<-rep(10,n0);if(!exists("WD")|is.null(WD)) WD<-rep(0,n0);if(!exists("FMC")|is.null(FMC)) FMC<-rep(0,n0);if(!exists("GS")|is.null(GS)) GS<-rep(0,n0)
-    if(!exists("LAT")|is.null(LAT)) LAT<-rep(55,n0);if(!exists("LONG")|is.null(LONG)) LONG<-rep(-120,n0);if(!exists("ELV")|is.null(ELV)) ELV<-rep(-100,n0)
+    if(!exists("LAT")|is.null(LAT)) LAT<-rep(55,n0);if(!exists("LONG")|is.null(LONG)) LONG<-rep(-120,n0);if(!exists("ELV")|is.null(ELV)) ELV<-rep(0,n0)
     if(!exists("SD")|is.null(SD)) SD<-rep(0,n0);if(!exists("SH")|is.null(SH)) SH<-rep(0,n0);if(!exists("DJ")|is.null(DJ)) DJ<-rep(180,n0);if(!exists("D0")|is.null(D0)) D0<-rep(0,n0)
-    if(!exists("HR")|is.null(HR)) HR<-rep(0,n0);if(!exists("PC")|is.null(PC)) PC<-rep(50,n0);if(!exists("PDF")|is.null(PDF)) PDF<-rep(35,n0);if(!exists("GFL")|is.null(GFL)) GFL<-rep(0.35,n0)
+    if(!exists("HR")|is.null(HR)) HR<-rep(1,n0);if(!exists("PC")|is.null(PC)) PC<-rep(50,n0);if(!exists("PDF")|is.null(PDF)) PDF<-rep(35,n0);if(!exists("GFL")|is.null(GFL)) GFL<-rep(0.35,n0)
     if(!exists("CC")|is.null(CC)) CC<-rep(80,n0);if(!exists("THETA")|is.null(THETA)) THETA<-rep(0,n0);if(!exists("ACCEL")|is.null(ACCEL)) ACCEL<-rep(0,n0)
     if(!exists("ASPECT")|is.null(ASPECT)) ASPECT<-rep(0,n0);if(!exists("BUIEFF")|is.null(BUIEFF)) BUIEFF<-rep(1,n0);if(!exists("CBH")|is.null(CBH)) CBH<-rep(3,n0)
-    if(!exists("CFL")|is.null(CFL)) CFL<-rep(0,n0);if(!exists("ISI")|is.null(ISI)) ISI<-rep(0,n0)
+    if(!exists("CFL")|is.null(CFL)) CFL<-rep(1,n0);if(!exists("ISI")|is.null(ISI)) ISI<-rep(0,n0)
     
     ### Data cleaning up
     WD     <- WD * pi/180
@@ -38,7 +38,7 @@ if(is.null(input)){                                                             
     DJ     <- ifelse(is.na(DJ),180,DJ)
     D0     <- ifelse(is.na(D0)|D0 < 0 | D0 > 366,0,D0)
     ELV    <- ifelse(ELV < 0 | ELV > 10000,0,ELV)
-    ELV    <- ifelse(is.na(ELV),100,ELV)
+    ELV    <- ifelse(is.na(ELV),0,ELV)
     BUIEFF <- ifelse(BUIEFF < 0,0,1)
     BUIEFF <- ifelse(is.na(BUIEFF),1,BUIEFF)
     HR     <- ifelse(HR < 0,-HR,HR)                                                                                                    # Originally "T"
@@ -70,8 +70,8 @@ if(is.null(input)){                                                             
     SH     <- ifelse(is.na(SH),0,SH)
   }
 
-FUELTYPE <- sub("-","",FUELTYPE)
-FUELTYPE <- sub(" ","",FUELTYPE)
+FUELTYPE<-sub("-","",FUELTYPE)
+FUELTYPE<-sub(" ","",FUELTYPE)
 # Convert time from hours to minutes */
 HR     <- HR*60.
 # Corrections to reorient WAZ, SAZ */
@@ -116,7 +116,7 @@ WSV0   <- .Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS,SAZ, FMC, SFC, PC, PDF, CC
 WSV    <- ifelse(GS > 0 & FFMC > 0,WSV0,WS)
 RAZ0   <- .Slopecalc(FUELTYPE, FFMC, BUI, WS, WAZ, GS,SAZ, FMC, SFC, PC, PDF, CC, CBH,ISI,output="RAZ")
 RAZ    <- ifelse(GS > 0 & FFMC > 0,RAZ0,WAZ)
-ISI    <- ifelse(ISI > 0,ISI,ISIcalc(FFMC,WSV))
+  ISI    <- ifelse(ISI > 0,ISI,.ISIcalc(FFMC, WSV))
 ROS    <- ifelse(FUELTYPE %in% c("C6"),.C6calc(FUELTYPE,ISI,BUI,FMC,SFC,CBH,option="ROS"),.ROScalc(FUELTYPE,ISI,BUI,FMC,SFC,PC,PDF,CC,CBH))
 CFB    <- ifelse(FUELTYPE %in% c("C6"),.C6calc(FUELTYPE,ISI,BUI,FMC,SFC,CBH,option="CFB"),ifelse(CFL>0,.CFBcalc(FUELTYPE,FMC,SFC,ROS,CBH),0))
 
