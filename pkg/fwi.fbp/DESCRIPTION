@@ -9,3 +9,4 @@ Depends: R (>= 2.11.0)
 Description: This package provides three new functions to calculate the outputs of the two main components of the Canadian Forest Fire Danger Rating System (CFFDRS): the Fire Weather Index (FWI) System and the Fire Behaviour Prediction (FBP) System.
 License: GPL-2
 URL: https://r-forge.r-project.org/projects/fwi-fbp/
+BugReports: https://r-forge.r-project.org/tracker/?group_id=1453
