@@ -26,7 +26,7 @@ This package includes three functions. Two functions, fwi and fwiBAT, are used f
 \author{
 Xianli Wang, Alan Cantin, Marc-Andre Parisien, Mike Wotton, Kerry Anderson, and Mike Flannigan
 
-Maintainer: Xianli Wang \email{xianli@ualberta.ca} and  \email{Alan Cantin Alan.Cantin@NRCan-RNCan.gc.ca}
+Maintainer: Xianli Wang \email{xianli@ualberta.ca}
 }
 \references{
 1. Van Wagner, C.E. and T.L. Pickett. 1985. Equations and FORTRAN program for the Canadian Forest Fire Weather Index System. Can. For. Serv., Ottawa, Ont. For. Tech. Rep. 33. 18 p.
