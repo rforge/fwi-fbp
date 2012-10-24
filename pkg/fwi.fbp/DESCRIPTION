@@ -4,7 +4,7 @@ Title: Fire Weather Index System and Fire Behaviour Prediction System Calculatio
 Version: 1.0
 Date: 2012-10-12
 Author: Xianli Wang, Alan Cantin, Marc-Andr&eacute; Parisien, Mike Wotton, Kerry Anderson, and Mike Flannigan
-Maintainer: Xianli Wang <Xianli.Wang@ales.ualberta.ca>
+Maintainer: Alan Cantin <Alan.Cantin@RNCan-NRCan.gc.ca>
 Depends: R (>= 2.11.0)
 Description: This package provides three new functions to calculate the outputs of the two main components of the Canadian Forest Fire Danger Rating System (CFFDRS): the Fire Weather Index (FWI) System and the Fire Behaviour Prediction (FBP) System.
 License: GPL-2
