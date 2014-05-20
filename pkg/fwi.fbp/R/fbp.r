@@ -178,7 +178,7 @@ if (output=="SECONDARY"|output=="ALL"|output =="S"|output =="A"){
       TTI<-log(ifelse(1-RSO/TROS > 0,1-RSO/TROS,1))/(-a4)
       
       DH <-ifelse(ACCEL==1,.DISTtcalc(FUELTYPE, ROS, HR, CFB),ROS*HR  )
-      DB <- ifelse(ACCEL==1,.DISTtcalc(FUELTYPE, ROS, HR, CFB),BROS*HR  )
+      DB <- ifelse(ACCEL==1,.DISTtcalc(FUELTYPE, BROS, HR, CFB),BROS*HR  )
       DF <- ifelse(ACCEL==1, (DH+DB)/(LBt*2), (DH+DB)/(LB*2)   )
   }
   if (exists("ID")) ID<-ID else ID <- row.names(input)  
