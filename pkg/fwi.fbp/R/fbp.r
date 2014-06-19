@@ -33,7 +33,7 @@ if(is.null(input)){                                                             
     ASPECT <- ifelse(ASPECT < 0,ASPECT+360,ASPECT)
     ASPECT <- ASPECT * pi/180
 
-    ACCEL  <- ifelse(is.na(ACCEL)|ACCEL < 0,0,1)	                                                                                                   # line (no accelleration effect) */
+    ACCEL  <- ifelse(is.na(ACCEL)|ACCEL <= 0,0,1)	                                                                                                   # line (no accelleration effect) */
     DJ     <- ifelse(DJ < 0 | DJ > 366,0,DJ)
     DJ     <- ifelse(is.na(DJ),180,DJ)
     D0     <- ifelse(is.na(D0)|D0 < 0 | D0 > 366,0,D0)
