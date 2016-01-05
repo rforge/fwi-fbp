@@ -1,7 +1,7 @@
 \name{fwi}
 \alias{fwi}
 \title{
-Fire Weather Index function
+Fire Weather Index function --[Deprecated]-- See replacement function \sQuote{fwi} in package \sQuote{cffdrs}
 }
 \description{
 \code{\link{fwi}} is used to calculate the outputs of the Fire Weather Index (FWI) System for one day based on noon local standard time (LST) weather observations of temperature, relative humidity, wind speed, and 24-hour rainfall, as well as the previous day's weather conditions. This function could be used for either one weather station or for multiple weather stations or a gridded surface. This is a lower-level function that allows for maximum flexibility in FWI System component calculations. This package also contains a similar high-level function, \code{\link{fwiBAT}},to calculate FWI System outputs for an entire fire season at one weather station. 
@@ -89,44 +89,3 @@ Xianli Wang, Alan Cantin, Marc-Andre Parisien, Mike Wotton, Kerry Anderson, and 
 3.  Lawson, B.D. and O.B. Armitage. 2008. Weather guide for the Canadian Forest Fire Danger Rating System. Nat. Resour. Can., Can. For. Serv., North. For. Cent., Edmonton, AB.
 
 }
-
-\seealso{
-   \code{\link{fwiBAT}},
-   \code{\link{fbp}}
-}
-\examples{
-library(fwi.fbp)
-# The test data is a standard test
-# dataset (Van Wagner and Pickett 1985). 
-
-data("test_fwi")
-head(test_fwi)
-# Using the default initial values
-fwi.out1<-fwi(test_fwi)   			
-
-# Using a different set of initial values
-fwi.out2<-fwi(test_fwi,init=c(80,10,16,50)) 
-
-# fwi system components calculated based on previous day's 
-# fwi outputs 
-fwi.out3<-fwi(test_fwi,fwi.out1)                 
-
-# Using a suite of initials, assuming variables from fwi.out1
-# are the initial values for different records
-init_suite<-fwi.out1[,c("ffmc","dmc","dc","lat")]
-fwi.out4<-fwi(test_fwi,init=init_suite)
-
-# Using only the required input variables:
-fwi.out5<-fwi(test_fwi[,7:10])  
-
-# Daylength adjustment:
-# Change latitude values where the monthly daylength adjustments
-# are different from the standard ones
-test_fwi$lat<-22
-# With daylength adjustment
-fwi(test_fwi)[1:3,]
-# Without daylength adjustment
-fwi(test_fwi,lat.adjust=FALSE)[1:3,]
-
-}
-\keyword{ methods }
