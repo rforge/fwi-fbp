@@ -1,7 +1,7 @@
 \name{fwiBAT}
 \alias{fwiBAT}
 \title{
-Fire Weather Index batch function --[Deprecated]-- See replacement function \sQuote{fwi} in package \sQuote{cffdrs}
+Fire Weather Index batch function, Deprecated
 }
 \description{
 fwiBAT generates Fire Weather Index (FWI) System outputs for one weather station during a continuous period of time. This is a high-level function in which FWI System components are calculated from a list of consecutive (e.g., all days of a fire season). For maximum flexibility, the low-level function fwi should be used. 
@@ -84,5 +84,23 @@ Xianli Wang, Alan Cantin, Marc-Andre Parisien, Mike Wotton, Kerry Anderson, and 
 2. Van Wagner, C.E. 1987. Development and structure of the Canadian forest fire weather index system. Forest Technology Report 35. (Canadian Forestry Service: Ottawa).
 
 3.  Lawson, B.D. and O.B. Armitage. 2008. Weather guide for the Canadian Forest Fire Danger Rating System. Nat. Resour. Can., Can. For. Serv., North. For. Cent., Edmonton, AB.
+
+}
+\examples{
+library(fwi.fbp)
+# The test data is a standard test
+# dataset for FWI system(Van Wagner and Pickett 1985). 
+
+data("test_fwi")
+head(test_fwi)
+
+# using the default initial values
+fwi.out<-fwiBAT(test_fwi)   			
+
+# using a different set of initials 
+fwi.out<-fwiBAT(test_fwi,init=c(80,10,16,50)) 
+
+# using only the required input variables:
+fwi.out<-fwiBAT(test_fwi[,7:10])
 
 }

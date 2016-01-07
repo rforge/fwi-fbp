@@ -1,7 +1,7 @@
 \name{fbp}
 \alias{fbp}
 \title{
-Fire Behavior Prediction System function --[Deprecated]-- See replacement function \sQuote{fbp} in package \sQuote{cffdrs}
+Fire Behavior Prediction System function, Deprecated
 }
 \description{
 fbp calculates the outputs from the Canadian Forest Fire Behavior Prediction (FBP) System (Forestry Canada Fire Danger Group 1992) based on given fire weather and fuel moisture conditions (from the Canadian Forest Fire Weather Index (FWI) System (Van Wagner 1987)), fuel type, date, and slope. Fire weather, for the purpose of FBP System calculation, comprises observations of 10 m wind speed and direction at the time of the fire, and two associated outputs from the Fire Weather Index System, the Fine Fuel Moisture Content (ffmc) and Buildup Index (bui). FWI System components can be calculated with the sister functions \code{\link{fwi}} and \code{\link{fwiBAT}}.
@@ -142,4 +142,38 @@ Xianli Wang, Alan Cantin, Marc-Andre Parisien, Mike Wotton, Kerry Anderson, and 
 3.  Wotton, B.M., Alexander, M.E., Taylor, S.W. 2009. Updates and revisions to the 1992 Canadian forest fire behavior prediction system. Nat. Resour. Can., Can. For. Serv., Great Lakes For. Cent., Sault Ste. Marie, Ontario, Canada. Information Report GLC-X-10, 45p. \url{http://publications.gc.ca/collections/collection_2010/nrcan/Fo123-2-10-2009-eng.pdf}
 
 4.  Tymstra, C., Bryce, R.W., Wotton, B.M., Armitage, O.B. 2009. Development and structure of Prometheus: the Canadian wildland fire growth simulation Model. Nat. Resour. Can., Can. For. Serv., North. For. Cent., Edmonton, AB. Inf. Rep. NOR-X-417.  
+}
+\examples{
+library(fwi.fbp)
+# The dataset is the standard test data
+# provided by Wotton et al (2009).
+data("test_fbp")
+head(test_fbp)
+#Primary output (default)
+fbp(test_fbp)
+#or
+fbp(test_fbp,output="Primary") 
+#or 
+fbp(test_fbp,"P")
+
+#Secondary output          
+fbp(test_fbp,"Secondary")
+#or
+fbp(test_fbp,"S")
+
+#All output          
+fbp(test_fbp,"All")
+#or
+fbp(test_fbp,"A")
+
+#For a single record:
+fbp(test_fbp[7,])  	
+#For a section of the records:
+fbp(test_fbp[8:13,])	
+
+#fbp function produces the default values if no data is fed to
+#the function:
+fbp()
+
+
 }
